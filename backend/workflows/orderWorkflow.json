@@ -1,0 +1,60 @@
+{
+  "Comment": "Pardos Chicken Order Workflow",
+  "StartAt": "Received",
+  "States": {
+    "Received": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName.$": "$.receivedLambda",
+        "Payload.$": "$"
+      },
+      "Next": "Cooking"
+    },
+    "Cooking": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName.$": "$.kitchenStartLambda",
+        "Payload.$": "$"
+      },
+      "Next": "Prepared"
+    },
+    "Prepared": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName.$": "$.kitchenCompleteLambda",
+        "Payload.$": "$"
+      },
+      "Next": "Packed"
+    },
+    "Packed": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName.$": "$.packingCompleteLambda",
+        "Payload.$": "$"
+      },
+      "Next": "AssignedDriver"
+    },
+    "AssignedDriver": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName.$": "$.assignDriverLambda",
+        "Payload.$": "$"
+      },
+      "Next": "Delivered"
+    },
+    "Delivered": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName.$": "$.orderDeliveredLambda",
+        "Payload.$": "$"
+      },
+      "End": true
+    }
+  }
+}

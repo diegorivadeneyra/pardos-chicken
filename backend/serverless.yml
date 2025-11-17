@@ -1,0 +1,219 @@
+service: pardos-chicken-orders
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1
+  stage: dev
+  environment:
+    TABLE_NAME: pardos-orders
+    EVENT_BUS_NAME: pardos-bus
+    EVIDENCE_BUCKET: pardos-evidence
+  httpApi:
+    cors: true
+
+plugins:
+  - serverless-step-functions
+  - serverless-iam-roles-per-function
+
+resources:
+  Resources:
+    OrdersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${env:TABLE_NAME}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: PK
+            AttributeType: S
+          - AttributeName: SK
+            AttributeType: S
+          - AttributeName: GSI1PK
+            AttributeType: S
+          - AttributeName: GSI1SK
+            AttributeType: S
+        KeySchema:
+          - AttributeName: PK
+            KeyType: HASH
+          - AttributeName: SK
+            KeyType: RANGE
+        GlobalSecondaryIndexes:
+          - IndexName: GSI1
+            KeySchema:
+              - AttributeName: GSI1PK
+                KeyType: HASH
+              - AttributeName: GSI1SK
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+
+    PardosEventBus:
+      Type: AWS::Events::EventBus
+      Properties:
+        Name: ${env:EVENT_BUS_NAME}
+
+    EvidenceBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${env:EVIDENCE_BUCKET}
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: true
+          BlockPublicPolicy: true
+          IgnorePublicAcls: true
+          RestrictPublicBuckets: true
+
+functions:
+  createOrder:
+    handler: src/orders/create.handler
+    events:
+      - httpApi:
+          path: /orders
+          method: POST
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:PutItem
+        Resource: arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${env:TABLE_NAME}
+      - Effect: Allow
+        Action:
+          - events:PutEvents
+        Resource: arn:aws:events:${aws:region}:${aws:accountId}:event-bus/${env:EVENT_BUS_NAME}
+      - Effect: Allow
+        Action:
+          - s3:PutObject
+        Resource: arn:aws:s3:::${env:EVIDENCE_BUCKET}/*
+
+  getOrder:
+    handler: src/orders/get.handler
+    events:
+      - httpApi:
+          path: /orders/{orderId}
+          method: GET
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:GetItem
+        Resource: arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${env:TABLE_NAME}
+
+  kitchenStart:
+    handler: src/kitchen/start.handler
+    events:
+      - httpApi:
+          path: /kitchen/{orderId}/start
+          method: POST
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:UpdateItem
+        Resource: arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${env:TABLE_NAME}
+      - Effect: Allow
+        Action:
+          - events:PutEvents
+        Resource: arn:aws:events:${aws:region}:${aws:accountId}:event-bus/${env:EVENT_BUS_NAME}
+      - Effect: Allow
+        Action:
+          - s3:PutObject
+        Resource: arn:aws:s3:::${env:EVIDENCE_BUCKET}/*
+
+  kitchenComplete:
+    handler: src/kitchen/complete.handler
+    events:
+      - httpApi:
+          path: /kitchen/{orderId}/complete
+          method: POST
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:UpdateItem
+        Resource: arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${env:TABLE_NAME}
+      - Effect: Allow
+        Action:
+          - events:PutEvents
+        Resource: arn:aws:events:${aws:region}:${aws:accountId}:event-bus/${env:EVENT_BUS_NAME}
+      - Effect: Allow
+        Action:
+          - s3:PutObject
+        Resource: arn:aws:s3:::${env:EVIDENCE_BUCKET}/*
+
+  packingComplete:
+    handler: src/packing/complete.handler
+    events:
+      - httpApi:
+          path: /packing/{orderId}/complete
+          method: POST
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:UpdateItem
+        Resource: arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${env:TABLE_NAME}
+      - Effect: Allow
+        Action:
+          - events:PutEvents
+        Resource: arn:aws:events:${aws:region}:${aws:accountId}:event-bus/${env:EVENT_BUS_NAME}
+      - Effect: Allow
+        Action:
+          - s3:PutObject
+        Resource: arn:aws:s3:::${env:EVIDENCE_BUCKET}/*
+
+  assignDriver:
+    handler: src/delivery/assign.handler
+    events:
+      - httpApi:
+          path: /delivery/{orderId}/assign
+          method: POST
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:UpdateItem
+        Resource: arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${env:TABLE_NAME}
+      - Effect: Allow
+        Action:
+          - events:PutEvents
+        Resource: arn:aws:events:${aws:region}:${aws:accountId}:event-bus/${env:EVENT_BUS_NAME}
+      - Effect: Allow
+        Action:
+          - s3:PutObject
+        Resource: arn:aws:s3:::${env:EVIDENCE_BUCKET}/*
+
+  orderDelivered:
+    handler: src/delivery/delivered.handler
+    events:
+      - httpApi:
+          path: /delivery/{orderId}/delivered
+          method: POST
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:UpdateItem
+        Resource: arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${env:TABLE_NAME}
+      - Effect: Allow
+        Action:
+          - events:PutEvents
+        Resource: arn:aws:events:${aws:region}:${aws:accountId}:event-bus/${env:EVENT_BUS_NAME}
+      - Effect: Allow
+        Action:
+          - s3:PutObject
+        Resource: arn:aws:s3:::${env:EVIDENCE_BUCKET}/*
+
+  listByStatus:
+    handler: src/dashboard/listByStatus.handler
+    events:
+      - httpApi:
+          path: /dashboard
+          method: GET
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:Query
+        Resource: arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${env:TABLE_NAME}/index/GSI1
+
+stepFunctions:
+  stateMachines:
+    orderWorkflow:
+      name: pardos-order-workflow
+      definition:
+        Fn::Transform:
+          Name: AWS::Include
+          Parameters:
+            Location: workflows/orderWorkflow.json

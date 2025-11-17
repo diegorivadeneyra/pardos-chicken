@@ -1,0 +1,22 @@
+{
+  "name": "pardos-chicken-orders",
+  "version": "1.0.0",
+  "description": "Serverless backend for Pardos Chicken order management",
+  "main": "index.js",
+  "scripts": {
+    "deploy": "serverless deploy",
+    "remove": "serverless remove"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.635.0",
+    "@aws-sdk/util-dynamodb": "^3.635.0",
+    "@aws-sdk/client-eventbridge": "^3.635.0",
+    "@aws-sdk/client-s3": "^3.635.0",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "serverless": "^3.39.0",
+    "serverless-step-functions": "^3.8.0",
+    "serverless-iam-roles-per-function": "^3.2.0"
+  }
+}
