@@ -9,10 +9,7 @@ provider:
   httpApi:
     cors: true
   iam:
-    role: arn:aws:iam::572536330236:role/voclabs   # usa tu rol existente
-
-plugins:
-  - serverless-iam-roles-per-function
+    role: arn:aws:iam::572536330236:role/LabRole   # usa el rol permitido en AWS Academy
 
 resources:
   Resources:
