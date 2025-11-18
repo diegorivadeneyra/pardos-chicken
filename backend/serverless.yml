@@ -8,6 +8,8 @@ provider:
   stage: dev
   httpApi:
     cors: true
+  iam:
+    role: arn:aws:iam::572536330236:role/voclabs   # usa tu rol existente
 
 plugins:
   - serverless-iam-roles-per-function
@@ -65,19 +67,6 @@ functions:
       - httpApi:
           path: /orders
           method: POST
-    iamRoleStatements:
-      - Effect: Allow
-        Action:
-          - dynamodb:PutItem
-        Resource: arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/pardos-orders
-      - Effect: Allow
-        Action:
-          - events:PutEvents
-        Resource: arn:aws:events:${aws:region}:${aws:accountId}:event-bus/pardos-bus
-      - Effect: Allow
-        Action:
-          - s3:PutObject
-        Resource: arn:aws:s3:::pardos-evidence/*
 
   getOrder:
     handler: src/orders/get.handler
@@ -85,11 +74,6 @@ functions:
       - httpApi:
           path: /orders/{orderId}
           method: GET
-    iamRoleStatements:
-      - Effect: Allow
-        Action:
-          - dynamodb:GetItem
-        Resource: arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/pardos-orders
 
   kitchenStart:
     handler: src/kitchen/start.handler
@@ -97,19 +81,6 @@ functions:
       - httpApi:
           path: /kitchen/{orderId}/start
           method: POST
-    iamRoleStatements:
-      - Effect: Allow
-        Action:
-          - dynamodb:UpdateItem
-        Resource: arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/pardos-orders
-      - Effect: Allow
-        Action:
-          - events:PutEvents
-        Resource: arn:aws:events:${aws:region}:${aws:accountId}:event-bus/pardos-bus
-      - Effect: Allow
-        Action:
-          - s3:PutObject
-        Resource: arn:aws:s3:::pardos-evidence/*
 
   kitchenComplete:
     handler: src/kitchen/complete.handler
@@ -117,19 +88,6 @@ functions:
       - httpApi:
           path: /kitchen/{orderId}/complete
           method: POST
-    iamRoleStatements:
-      - Effect: Allow
-        Action:
-          - dynamodb:UpdateItem
-        Resource: arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/pardos-orders
-      - Effect: Allow
-        Action:
-          - events:PutEvents
-        Resource: arn:aws:events:${aws:region}:${aws:accountId}:event-bus/pardos-bus
-      - Effect: Allow
-        Action:
-          - s3:PutObject
-        Resource: arn:aws:s3:::pardos-evidence/*
 
   packingComplete:
     handler: src/packing/complete.handler
@@ -137,19 +95,6 @@ functions:
       - httpApi:
           path: /packing/{orderId}/complete
           method: POST
-    iamRoleStatements:
-      - Effect: Allow
-        Action:
-          - dynamodb:UpdateItem
-        Resource: arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/pardos-orders
-      - Effect: Allow
-        Action:
-          - events:PutEvents
-        Resource: arn:aws:events:${aws:region}:${aws:accountId}:event-bus/pardos-bus
-      - Effect: Allow
-        Action:
-          - s3:PutObject
-        Resource: arn:aws:s3:::pardos-evidence/*
 
   assignDriver:
     handler: src/delivery/assign.handler
@@ -157,19 +102,6 @@ functions:
       - httpApi:
           path: /delivery/{orderId}/assign
           method: POST
-    iamRoleStatements:
-      - Effect: Allow
-        Action:
-          - dynamodb:UpdateItem
-        Resource: arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/pardos-orders
-      - Effect: Allow
-        Action:
-          - events:PutEvents
-        Resource: arn:aws:events:${aws:region}:${aws:accountId}:event-bus/pardos-bus
-      - Effect: Allow
-        Action:
-          - s3:PutObject
-        Resource: arn:aws:s3:::pardos-evidence/*
 
   orderDelivered:
     handler: src/delivery/delivered.handler
@@ -177,19 +109,6 @@ functions:
       - httpApi:
           path: /delivery/{orderId}/delivered
           method: POST
-    iamRoleStatements:
-      - Effect: Allow
-        Action:
-          - dynamodb:UpdateItem
-        Resource: arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/pardos-orders
-      - Effect: Allow
-        Action:
-          - events:PutEvents
-        Resource: arn:aws:events:${aws:region}:${aws:accountId}:event-bus/pardos-bus
-      - Effect: Allow
-        Action:
-          - s3:PutObject
-        Resource: arn:aws:s3:::pardos-evidence/*
 
   listByStatus:
     handler: src/dashboard/listByStatus.handler
@@ -197,8 +116,3 @@ functions:
       - httpApi:
           path: /dashboard
           method: GET
-    iamRoleStatements:
-      - Effect: Allow
-        Action:
-          - dynamodb:Query
-        Resource: arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/pardos-orders/index/GSI1
