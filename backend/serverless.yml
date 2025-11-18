@@ -75,7 +75,14 @@ functions:
       - httpApi:
           path: /orders/{orderId}
           method: GET
-
+          
+  listAllOrders:
+    handler: src/orders/listAll.handler
+    events:
+      - http:
+          path: orders
+          method: GET
+  
   kitchenStart:
     handler: src/kitchen/start.handler
     events:
@@ -117,4 +124,5 @@ functions:
       - httpApi:
           path: /dashboard
           method: GET
+
 
