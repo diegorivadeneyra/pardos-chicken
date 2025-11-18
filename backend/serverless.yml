@@ -10,7 +10,11 @@ provider:
     cors: true
   iam:
     role: arn:aws:iam::572536330236:role/LabRole   # usa el rol permitido en AWS Academy
-
+  environment:
+      TABLE_NAME: pardos-orders
+      EVENT_BUS_NAME: pardos-bus
+      EVIDENCE_BUCKET: pardos-evidence
+      
 resources:
   Resources:
     OrdersTable:
@@ -113,3 +117,4 @@ functions:
       - httpApi:
           path: /dashboard
           method: GET
+
