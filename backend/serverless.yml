@@ -10,7 +10,6 @@ provider:
     cors: true
 
 plugins:
-  - serverless-step-functions
   - serverless-iam-roles-per-function
 
 resources:
@@ -203,13 +202,3 @@ functions:
         Action:
           - dynamodb:Query
         Resource: arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/pardos-orders/index/GSI1
-
-stepFunctions:
-  stateMachines:
-    orderWorkflow:
-      name: pardos-order-workflow
-      definition:
-        Fn::Transform:
-          Name: AWS::Include
-          Parameters:
-            Location: workflows/orderWorkflow.json
