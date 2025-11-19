@@ -80,7 +80,7 @@ functions:
     handler: src/orders/listAll.handler
     events:
       - httpApi:
-          path: orders
+          path: /orders
           method: GET
   
   kitchenStart:
@@ -124,6 +124,7 @@ functions:
       - httpApi:
           path: /dashboard
           method: GET
+
 
 
 
