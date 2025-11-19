@@ -79,7 +79,7 @@ functions:
   listAllOrders:
     handler: src/orders/listAll.handler
     events:
-      - http:
+      - httpApi:
           path: orders
           method: GET
   
@@ -124,5 +124,6 @@ functions:
       - httpApi:
           path: /dashboard
           method: GET
+
 
 
