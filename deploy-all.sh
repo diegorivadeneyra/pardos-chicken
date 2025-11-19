@@ -6,7 +6,7 @@ cd backend
 sls deploy
 
 echo "🔗 Obteniendo URL de API Gateway..."
-URL=$(sls info | grep 'GET -' | head -n1 | awk '{print $3}' | sed 's/\/orders//')
+URL=$(sls info | grep 'ServiceEndpoint:' | awk '{print $2}')
 
 echo "🌍 URL detectada: $URL"
 
