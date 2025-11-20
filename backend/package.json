@@ -9,14 +9,15 @@
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.635.0",
-    "@aws-sdk/util-dynamodb": "^3.635.0",
     "@aws-sdk/client-eventbridge": "^3.635.0",
     "@aws-sdk/client-s3": "^3.635.0",
+    "@aws-sdk/util-dynamodb": "^3.635.0",
+    "aws-sdk": "^2.1692.0",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
     "serverless": "^3.39.0",
-    "serverless-step-functions": "^3.8.0",
-    "serverless-iam-roles-per-function": "^3.2.0"
+    "serverless-iam-roles-per-function": "^3.2.0",
+    "serverless-step-functions": "^3.8.0"
   }
 }

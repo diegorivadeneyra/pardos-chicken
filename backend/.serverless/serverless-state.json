@@ -1,0 +1,1735 @@
+{
+  "service": {
+    "service": "pardos-chicken-orders",
+    "serviceObject": {
+      "name": "pardos-chicken-orders"
+    },
+    "provider": {
+      "name": "aws",
+      "runtime": "nodejs18.x",
+      "region": "us-east-1",
+      "stage": "dev",
+      "httpApi": {
+        "cors": true
+      },
+      "iam": {
+        "role": "arn:aws:iam::572536330236:role/LabRole"
+      },
+      "environment": {
+        "TABLE_NAME": "pardos-orders",
+        "EVENT_BUS_NAME": "pardos-bus",
+        "EVIDENCE_BUCKET": "pardos-evidence"
+      },
+      "versionFunctions": true,
+      "compiledCloudFormationTemplate": {
+        "AWSTemplateFormatVersion": "2010-09-09",
+        "Description": "The AWS CloudFormation template for this Serverless application",
+        "Resources": {
+          "ServerlessDeploymentBucket": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+              "BucketEncryption": {
+                "ServerSideEncryptionConfiguration": [
+                  {
+                    "ServerSideEncryptionByDefault": {
+                      "SSEAlgorithm": "AES256"
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "ServerlessDeploymentBucketPolicy": {
+            "Type": "AWS::S3::BucketPolicy",
+            "Properties": {
+              "Bucket": {
+                "Ref": "ServerlessDeploymentBucket"
+              },
+              "PolicyDocument": {
+                "Statement": [
+                  {
+                    "Action": "s3:*",
+                    "Effect": "Deny",
+                    "Principal": "*",
+                    "Resource": [
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "arn:",
+                            {
+                              "Ref": "AWS::Partition"
+                            },
+                            ":s3:::",
+                            {
+                              "Ref": "ServerlessDeploymentBucket"
+                            },
+                            "/*"
+                          ]
+                        ]
+                      },
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "arn:",
+                            {
+                              "Ref": "AWS::Partition"
+                            },
+                            ":s3:::",
+                            {
+                              "Ref": "ServerlessDeploymentBucket"
+                            }
+                          ]
+                        ]
+                      }
+                    ],
+                    "Condition": {
+                      "Bool": {
+                        "aws:SecureTransport": false
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "CreateOrderLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/pardos-chicken-orders-dev-createOrder"
+            }
+          },
+          "GetOrderLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/pardos-chicken-orders-dev-getOrder"
+            }
+          },
+          "ListAllOrdersLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/pardos-chicken-orders-dev-listAllOrders"
+            }
+          },
+          "KitchenStartLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/pardos-chicken-orders-dev-kitchenStart"
+            }
+          },
+          "KitchenCompleteLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/pardos-chicken-orders-dev-kitchenComplete"
+            }
+          },
+          "PackingCompleteLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/pardos-chicken-orders-dev-packingComplete"
+            }
+          },
+          "AssignDriverLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/pardos-chicken-orders-dev-assignDriver"
+            }
+          },
+          "OrderDeliveredLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/pardos-chicken-orders-dev-orderDelivered"
+            }
+          },
+          "ListByStatusLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/pardos-chicken-orders-dev-listByStatus"
+            }
+          },
+          "CreateOrderLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": {
+                  "Ref": "ServerlessDeploymentBucket"
+                },
+                "S3Key": "serverless/pardos-chicken-orders/dev/1763586280695-2025-11-19T21:04:40.695Z/pardos-chicken-orders.zip"
+              },
+              "Handler": "src/orders/create.handler",
+              "Runtime": "nodejs18.x",
+              "FunctionName": "pardos-chicken-orders-dev-createOrder",
+              "MemorySize": 1024,
+              "Timeout": 6,
+              "Environment": {
+                "Variables": {
+                  "TABLE_NAME": "pardos-orders",
+                  "EVENT_BUS_NAME": "pardos-bus",
+                  "EVIDENCE_BUCKET": "pardos-evidence"
+                }
+              },
+              "Role": "arn:aws:iam::572536330236:role/LabRole"
+            },
+            "DependsOn": [
+              "CreateOrderLogGroup"
+            ]
+          },
+          "GetOrderLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": {
+                  "Ref": "ServerlessDeploymentBucket"
+                },
+                "S3Key": "serverless/pardos-chicken-orders/dev/1763586280695-2025-11-19T21:04:40.695Z/pardos-chicken-orders.zip"
+              },
+              "Handler": "src/orders/get.handler",
+              "Runtime": "nodejs18.x",
+              "FunctionName": "pardos-chicken-orders-dev-getOrder",
+              "MemorySize": 1024,
+              "Timeout": 6,
+              "Environment": {
+                "Variables": {
+                  "TABLE_NAME": "pardos-orders",
+                  "EVENT_BUS_NAME": "pardos-bus",
+                  "EVIDENCE_BUCKET": "pardos-evidence"
+                }
+              },
+              "Role": "arn:aws:iam::572536330236:role/LabRole"
+            },
+            "DependsOn": [
+              "GetOrderLogGroup"
+            ]
+          },
+          "ListAllOrdersLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": {
+                  "Ref": "ServerlessDeploymentBucket"
+                },
+                "S3Key": "serverless/pardos-chicken-orders/dev/1763586280695-2025-11-19T21:04:40.695Z/pardos-chicken-orders.zip"
+              },
+              "Handler": "src/orders/listAll.handler",
+              "Runtime": "nodejs18.x",
+              "FunctionName": "pardos-chicken-orders-dev-listAllOrders",
+              "MemorySize": 1024,
+              "Timeout": 6,
+              "Environment": {
+                "Variables": {
+                  "TABLE_NAME": "pardos-orders",
+                  "EVENT_BUS_NAME": "pardos-bus",
+                  "EVIDENCE_BUCKET": "pardos-evidence"
+                }
+              },
+              "Role": "arn:aws:iam::572536330236:role/LabRole"
+            },
+            "DependsOn": [
+              "ListAllOrdersLogGroup"
+            ]
+          },
+          "KitchenStartLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": {
+                  "Ref": "ServerlessDeploymentBucket"
+                },
+                "S3Key": "serverless/pardos-chicken-orders/dev/1763586280695-2025-11-19T21:04:40.695Z/pardos-chicken-orders.zip"
+              },
+              "Handler": "src/kitchen/start.handler",
+              "Runtime": "nodejs18.x",
+              "FunctionName": "pardos-chicken-orders-dev-kitchenStart",
+              "MemorySize": 1024,
+              "Timeout": 6,
+              "Environment": {
+                "Variables": {
+                  "TABLE_NAME": "pardos-orders",
+                  "EVENT_BUS_NAME": "pardos-bus",
+                  "EVIDENCE_BUCKET": "pardos-evidence"
+                }
+              },
+              "Role": "arn:aws:iam::572536330236:role/LabRole"
+            },
+            "DependsOn": [
+              "KitchenStartLogGroup"
+            ]
+          },
+          "KitchenCompleteLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": {
+                  "Ref": "ServerlessDeploymentBucket"
+                },
+                "S3Key": "serverless/pardos-chicken-orders/dev/1763586280695-2025-11-19T21:04:40.695Z/pardos-chicken-orders.zip"
+              },
+              "Handler": "src/kitchen/complete.handler",
+              "Runtime": "nodejs18.x",
+              "FunctionName": "pardos-chicken-orders-dev-kitchenComplete",
+              "MemorySize": 1024,
+              "Timeout": 6,
+              "Environment": {
+                "Variables": {
+                  "TABLE_NAME": "pardos-orders",
+                  "EVENT_BUS_NAME": "pardos-bus",
+                  "EVIDENCE_BUCKET": "pardos-evidence"
+                }
+              },
+              "Role": "arn:aws:iam::572536330236:role/LabRole"
+            },
+            "DependsOn": [
+              "KitchenCompleteLogGroup"
+            ]
+          },
+          "PackingCompleteLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": {
+                  "Ref": "ServerlessDeploymentBucket"
+                },
+                "S3Key": "serverless/pardos-chicken-orders/dev/1763586280695-2025-11-19T21:04:40.695Z/pardos-chicken-orders.zip"
+              },
+              "Handler": "src/packing/complete.handler",
+              "Runtime": "nodejs18.x",
+              "FunctionName": "pardos-chicken-orders-dev-packingComplete",
+              "MemorySize": 1024,
+              "Timeout": 6,
+              "Environment": {
+                "Variables": {
+                  "TABLE_NAME": "pardos-orders",
+                  "EVENT_BUS_NAME": "pardos-bus",
+                  "EVIDENCE_BUCKET": "pardos-evidence"
+                }
+              },
+              "Role": "arn:aws:iam::572536330236:role/LabRole"
+            },
+            "DependsOn": [
+              "PackingCompleteLogGroup"
+            ]
+          },
+          "AssignDriverLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": {
+                  "Ref": "ServerlessDeploymentBucket"
+                },
+                "S3Key": "serverless/pardos-chicken-orders/dev/1763586280695-2025-11-19T21:04:40.695Z/pardos-chicken-orders.zip"
+              },
+              "Handler": "src/delivery/assign.handler",
+              "Runtime": "nodejs18.x",
+              "FunctionName": "pardos-chicken-orders-dev-assignDriver",
+              "MemorySize": 1024,
+              "Timeout": 6,
+              "Environment": {
+                "Variables": {
+                  "TABLE_NAME": "pardos-orders",
+                  "EVENT_BUS_NAME": "pardos-bus",
+                  "EVIDENCE_BUCKET": "pardos-evidence"
+                }
+              },
+              "Role": "arn:aws:iam::572536330236:role/LabRole"
+            },
+            "DependsOn": [
+              "AssignDriverLogGroup"
+            ]
+          },
+          "OrderDeliveredLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": {
+                  "Ref": "ServerlessDeploymentBucket"
+                },
+                "S3Key": "serverless/pardos-chicken-orders/dev/1763586280695-2025-11-19T21:04:40.695Z/pardos-chicken-orders.zip"
+              },
+              "Handler": "src/delivery/delivered.handler",
+              "Runtime": "nodejs18.x",
+              "FunctionName": "pardos-chicken-orders-dev-orderDelivered",
+              "MemorySize": 1024,
+              "Timeout": 6,
+              "Environment": {
+                "Variables": {
+                  "TABLE_NAME": "pardos-orders",
+                  "EVENT_BUS_NAME": "pardos-bus",
+                  "EVIDENCE_BUCKET": "pardos-evidence"
+                }
+              },
+              "Role": "arn:aws:iam::572536330236:role/LabRole"
+            },
+            "DependsOn": [
+              "OrderDeliveredLogGroup"
+            ]
+          },
+          "ListByStatusLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": {
+                  "Ref": "ServerlessDeploymentBucket"
+                },
+                "S3Key": "serverless/pardos-chicken-orders/dev/1763586280695-2025-11-19T21:04:40.695Z/pardos-chicken-orders.zip"
+              },
+              "Handler": "src/dashboard/listByStatus.handler",
+              "Runtime": "nodejs18.x",
+              "FunctionName": "pardos-chicken-orders-dev-listByStatus",
+              "MemorySize": 1024,
+              "Timeout": 6,
+              "Environment": {
+                "Variables": {
+                  "TABLE_NAME": "pardos-orders",
+                  "EVENT_BUS_NAME": "pardos-bus",
+                  "EVIDENCE_BUCKET": "pardos-evidence"
+                }
+              },
+              "Role": "arn:aws:iam::572536330236:role/LabRole"
+            },
+            "DependsOn": [
+              "ListByStatusLogGroup"
+            ]
+          },
+          "CreateOrderLambdaVersion8OjS6LGXKY3PH3Qulg95AlyzkjwHTmrpamJUG7Rs": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "CreateOrderLambdaFunction"
+              },
+              "CodeSha256": "+KE445K8gMiEMkP1bNT/obFeng6EJo5P/Du3bZZMhhI="
+            }
+          },
+          "GetOrderLambdaVersionZJXdF9kYEs0LI9gUR9sFgStCOJAnz2W5M1K14Dg1I": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "GetOrderLambdaFunction"
+              },
+              "CodeSha256": "+KE445K8gMiEMkP1bNT/obFeng6EJo5P/Du3bZZMhhI="
+            }
+          },
+          "ListAllOrdersLambdaVersionPlHrMU1ZxgmamBwLa0inRZ0CZWn41iNoR0lqIN800": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "ListAllOrdersLambdaFunction"
+              },
+              "CodeSha256": "+KE445K8gMiEMkP1bNT/obFeng6EJo5P/Du3bZZMhhI="
+            }
+          },
+          "KitchenStartLambdaVersionIW7ro7XeO4v73fnNTmzUpMAWkzSQoXXD2NaVSKKwalU": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "KitchenStartLambdaFunction"
+              },
+              "CodeSha256": "+KE445K8gMiEMkP1bNT/obFeng6EJo5P/Du3bZZMhhI="
+            }
+          },
+          "KitchenCompleteLambdaVersionFXMa8AvHV7sHdjuEk1W2W43UDusUBJ7COBseFcNrd7U": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "KitchenCompleteLambdaFunction"
+              },
+              "CodeSha256": "+KE445K8gMiEMkP1bNT/obFeng6EJo5P/Du3bZZMhhI="
+            }
+          },
+          "PackingCompleteLambdaVersioneU55BJhInrk34FH6pvvy76jRGrxbs85Ixi6Ii0ljA6A": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "PackingCompleteLambdaFunction"
+              },
+              "CodeSha256": "+KE445K8gMiEMkP1bNT/obFeng6EJo5P/Du3bZZMhhI="
+            }
+          },
+          "AssignDriverLambdaVersionDgKynDUBYKNtFtEQLg6zI1FBpMpxWAgXQabzUfTIw": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "AssignDriverLambdaFunction"
+              },
+              "CodeSha256": "+KE445K8gMiEMkP1bNT/obFeng6EJo5P/Du3bZZMhhI="
+            }
+          },
+          "OrderDeliveredLambdaVersionQOPgo6VpGXmWqRJYWEvYcPrwMwgQ0xDXuS0zCtTng": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "OrderDeliveredLambdaFunction"
+              },
+              "CodeSha256": "+KE445K8gMiEMkP1bNT/obFeng6EJo5P/Du3bZZMhhI="
+            }
+          },
+          "ListByStatusLambdaVersion4lBO9NjCyuLZAnsnBRsbgvfIakPgqOqN0RxusbkiVbg": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "ListByStatusLambdaFunction"
+              },
+              "CodeSha256": "+KE445K8gMiEMkP1bNT/obFeng6EJo5P/Du3bZZMhhI="
+            }
+          },
+          "HttpApi": {
+            "Type": "AWS::ApiGatewayV2::Api",
+            "Properties": {
+              "Name": "dev-pardos-chicken-orders",
+              "ProtocolType": "HTTP",
+              "CorsConfiguration": {
+                "AllowHeaders": [
+                  "Content-Type",
+                  "X-Amz-Date",
+                  "Authorization",
+                  "X-Api-Key",
+                  "X-Amz-Security-Token",
+                  "X-Amz-User-Agent",
+                  "X-Amzn-Trace-Id"
+                ],
+                "AllowMethods": [
+                  "OPTIONS",
+                  "POST",
+                  "GET"
+                ],
+                "AllowOrigins": [
+                  "*"
+                ]
+              }
+            }
+          },
+          "HttpApiStage": {
+            "Type": "AWS::ApiGatewayV2::Stage",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "StageName": "$default",
+              "AutoDeploy": true,
+              "DefaultRouteSettings": {
+                "DetailedMetricsEnabled": false
+              }
+            }
+          },
+          "CreateOrderLambdaPermissionHttpApi": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "CreateOrderLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "HttpApi"
+                    },
+                    "/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "HttpApiIntegrationCreateOrder": {
+            "Type": "AWS::ApiGatewayV2::Integration",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "IntegrationType": "AWS_PROXY",
+              "IntegrationUri": {
+                "$ref": "$[\"service\"][\"provider\"][\"compiledCloudFormationTemplate\"][\"Resources\"][\"CreateOrderLambdaPermissionHttpApi\"][\"Properties\"][\"FunctionName\"]"
+              },
+              "PayloadFormatVersion": "2.0",
+              "TimeoutInMillis": 30000
+            }
+          },
+          "HttpApiRoutePostOrders": {
+            "Type": "AWS::ApiGatewayV2::Route",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "RouteKey": "POST /orders",
+              "Target": {
+                "Fn::Join": [
+                  "/",
+                  [
+                    "integrations",
+                    {
+                      "Ref": "HttpApiIntegrationCreateOrder"
+                    }
+                  ]
+                ]
+              }
+            },
+            "DependsOn": "HttpApiIntegrationCreateOrder"
+          },
+          "GetOrderLambdaPermissionHttpApi": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "GetOrderLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "HttpApi"
+                    },
+                    "/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "HttpApiIntegrationGetOrder": {
+            "Type": "AWS::ApiGatewayV2::Integration",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "IntegrationType": "AWS_PROXY",
+              "IntegrationUri": {
+                "$ref": "$[\"service\"][\"provider\"][\"compiledCloudFormationTemplate\"][\"Resources\"][\"GetOrderLambdaPermissionHttpApi\"][\"Properties\"][\"FunctionName\"]"
+              },
+              "PayloadFormatVersion": "2.0",
+              "TimeoutInMillis": 30000
+            }
+          },
+          "HttpApiRouteGetOrdersOrderidVar": {
+            "Type": "AWS::ApiGatewayV2::Route",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "RouteKey": "GET /orders/{orderId}",
+              "Target": {
+                "Fn::Join": [
+                  "/",
+                  [
+                    "integrations",
+                    {
+                      "Ref": "HttpApiIntegrationGetOrder"
+                    }
+                  ]
+                ]
+              }
+            },
+            "DependsOn": "HttpApiIntegrationGetOrder"
+          },
+          "ListAllOrdersLambdaPermissionHttpApi": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "ListAllOrdersLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "HttpApi"
+                    },
+                    "/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "HttpApiIntegrationListAllOrders": {
+            "Type": "AWS::ApiGatewayV2::Integration",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "IntegrationType": "AWS_PROXY",
+              "IntegrationUri": {
+                "$ref": "$[\"service\"][\"provider\"][\"compiledCloudFormationTemplate\"][\"Resources\"][\"ListAllOrdersLambdaPermissionHttpApi\"][\"Properties\"][\"FunctionName\"]"
+              },
+              "PayloadFormatVersion": "2.0",
+              "TimeoutInMillis": 30000
+            }
+          },
+          "HttpApiRouteGetOrders": {
+            "Type": "AWS::ApiGatewayV2::Route",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "RouteKey": "GET /orders",
+              "Target": {
+                "Fn::Join": [
+                  "/",
+                  [
+                    "integrations",
+                    {
+                      "Ref": "HttpApiIntegrationListAllOrders"
+                    }
+                  ]
+                ]
+              }
+            },
+            "DependsOn": "HttpApiIntegrationListAllOrders"
+          },
+          "KitchenStartLambdaPermissionHttpApi": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "KitchenStartLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "HttpApi"
+                    },
+                    "/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "HttpApiIntegrationKitchenStart": {
+            "Type": "AWS::ApiGatewayV2::Integration",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "IntegrationType": "AWS_PROXY",
+              "IntegrationUri": {
+                "$ref": "$[\"service\"][\"provider\"][\"compiledCloudFormationTemplate\"][\"Resources\"][\"KitchenStartLambdaPermissionHttpApi\"][\"Properties\"][\"FunctionName\"]"
+              },
+              "PayloadFormatVersion": "2.0",
+              "TimeoutInMillis": 30000
+            }
+          },
+          "HttpApiRoutePostKitchenOrderidVarStart": {
+            "Type": "AWS::ApiGatewayV2::Route",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "RouteKey": "POST /kitchen/{orderId}/start",
+              "Target": {
+                "Fn::Join": [
+                  "/",
+                  [
+                    "integrations",
+                    {
+                      "Ref": "HttpApiIntegrationKitchenStart"
+                    }
+                  ]
+                ]
+              }
+            },
+            "DependsOn": "HttpApiIntegrationKitchenStart"
+          },
+          "KitchenCompleteLambdaPermissionHttpApi": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "KitchenCompleteLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "HttpApi"
+                    },
+                    "/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "HttpApiIntegrationKitchenComplete": {
+            "Type": "AWS::ApiGatewayV2::Integration",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "IntegrationType": "AWS_PROXY",
+              "IntegrationUri": {
+                "$ref": "$[\"service\"][\"provider\"][\"compiledCloudFormationTemplate\"][\"Resources\"][\"KitchenCompleteLambdaPermissionHttpApi\"][\"Properties\"][\"FunctionName\"]"
+              },
+              "PayloadFormatVersion": "2.0",
+              "TimeoutInMillis": 30000
+            }
+          },
+          "HttpApiRoutePostKitchenOrderidVarComplete": {
+            "Type": "AWS::ApiGatewayV2::Route",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "RouteKey": "POST /kitchen/{orderId}/complete",
+              "Target": {
+                "Fn::Join": [
+                  "/",
+                  [
+                    "integrations",
+                    {
+                      "Ref": "HttpApiIntegrationKitchenComplete"
+                    }
+                  ]
+                ]
+              }
+            },
+            "DependsOn": "HttpApiIntegrationKitchenComplete"
+          },
+          "PackingCompleteLambdaPermissionHttpApi": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "PackingCompleteLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "HttpApi"
+                    },
+                    "/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "HttpApiIntegrationPackingComplete": {
+            "Type": "AWS::ApiGatewayV2::Integration",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "IntegrationType": "AWS_PROXY",
+              "IntegrationUri": {
+                "$ref": "$[\"service\"][\"provider\"][\"compiledCloudFormationTemplate\"][\"Resources\"][\"PackingCompleteLambdaPermissionHttpApi\"][\"Properties\"][\"FunctionName\"]"
+              },
+              "PayloadFormatVersion": "2.0",
+              "TimeoutInMillis": 30000
+            }
+          },
+          "HttpApiRoutePostPackingOrderidVarComplete": {
+            "Type": "AWS::ApiGatewayV2::Route",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "RouteKey": "POST /packing/{orderId}/complete",
+              "Target": {
+                "Fn::Join": [
+                  "/",
+                  [
+                    "integrations",
+                    {
+                      "Ref": "HttpApiIntegrationPackingComplete"
+                    }
+                  ]
+                ]
+              }
+            },
+            "DependsOn": "HttpApiIntegrationPackingComplete"
+          },
+          "AssignDriverLambdaPermissionHttpApi": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "AssignDriverLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "HttpApi"
+                    },
+                    "/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "HttpApiIntegrationAssignDriver": {
+            "Type": "AWS::ApiGatewayV2::Integration",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "IntegrationType": "AWS_PROXY",
+              "IntegrationUri": {
+                "$ref": "$[\"service\"][\"provider\"][\"compiledCloudFormationTemplate\"][\"Resources\"][\"AssignDriverLambdaPermissionHttpApi\"][\"Properties\"][\"FunctionName\"]"
+              },
+              "PayloadFormatVersion": "2.0",
+              "TimeoutInMillis": 30000
+            }
+          },
+          "HttpApiRoutePostDeliveryOrderidVarAssign": {
+            "Type": "AWS::ApiGatewayV2::Route",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "RouteKey": "POST /delivery/{orderId}/assign",
+              "Target": {
+                "Fn::Join": [
+                  "/",
+                  [
+                    "integrations",
+                    {
+                      "Ref": "HttpApiIntegrationAssignDriver"
+                    }
+                  ]
+                ]
+              }
+            },
+            "DependsOn": "HttpApiIntegrationAssignDriver"
+          },
+          "OrderDeliveredLambdaPermissionHttpApi": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "OrderDeliveredLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "HttpApi"
+                    },
+                    "/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "HttpApiIntegrationOrderDelivered": {
+            "Type": "AWS::ApiGatewayV2::Integration",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "IntegrationType": "AWS_PROXY",
+              "IntegrationUri": {
+                "$ref": "$[\"service\"][\"provider\"][\"compiledCloudFormationTemplate\"][\"Resources\"][\"OrderDeliveredLambdaPermissionHttpApi\"][\"Properties\"][\"FunctionName\"]"
+              },
+              "PayloadFormatVersion": "2.0",
+              "TimeoutInMillis": 30000
+            }
+          },
+          "HttpApiRoutePostDeliveryOrderidVarDelivered": {
+            "Type": "AWS::ApiGatewayV2::Route",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "RouteKey": "POST /delivery/{orderId}/delivered",
+              "Target": {
+                "Fn::Join": [
+                  "/",
+                  [
+                    "integrations",
+                    {
+                      "Ref": "HttpApiIntegrationOrderDelivered"
+                    }
+                  ]
+                ]
+              }
+            },
+            "DependsOn": "HttpApiIntegrationOrderDelivered"
+          },
+          "ListByStatusLambdaPermissionHttpApi": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "ListByStatusLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "HttpApi"
+                    },
+                    "/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "HttpApiIntegrationListByStatus": {
+            "Type": "AWS::ApiGatewayV2::Integration",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "IntegrationType": "AWS_PROXY",
+              "IntegrationUri": {
+                "$ref": "$[\"service\"][\"provider\"][\"compiledCloudFormationTemplate\"][\"Resources\"][\"ListByStatusLambdaPermissionHttpApi\"][\"Properties\"][\"FunctionName\"]"
+              },
+              "PayloadFormatVersion": "2.0",
+              "TimeoutInMillis": 30000
+            }
+          },
+          "HttpApiRouteGetDashboard": {
+            "Type": "AWS::ApiGatewayV2::Route",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "RouteKey": "GET /dashboard",
+              "Target": {
+                "Fn::Join": [
+                  "/",
+                  [
+                    "integrations",
+                    {
+                      "Ref": "HttpApiIntegrationListByStatus"
+                    }
+                  ]
+                ]
+              }
+            },
+            "DependsOn": "HttpApiIntegrationListByStatus"
+          },
+          "OrdersTable": {
+            "Type": "AWS::DynamoDB::Table",
+            "Properties": {
+              "TableName": "pardos-orders",
+              "BillingMode": "PAY_PER_REQUEST",
+              "AttributeDefinitions": [
+                {
+                  "AttributeName": "PK",
+                  "AttributeType": "S"
+                },
+                {
+                  "AttributeName": "SK",
+                  "AttributeType": "S"
+                },
+                {
+                  "AttributeName": "GSI1PK",
+                  "AttributeType": "S"
+                },
+                {
+                  "AttributeName": "GSI1SK",
+                  "AttributeType": "S"
+                }
+              ],
+              "KeySchema": [
+                {
+                  "AttributeName": "PK",
+                  "KeyType": "HASH"
+                },
+                {
+                  "AttributeName": "SK",
+                  "KeyType": "RANGE"
+                }
+              ],
+              "GlobalSecondaryIndexes": [
+                {
+                  "IndexName": "GSI1",
+                  "KeySchema": [
+                    {
+                      "AttributeName": "GSI1PK",
+                      "KeyType": "HASH"
+                    },
+                    {
+                      "AttributeName": "GSI1SK",
+                      "KeyType": "RANGE"
+                    }
+                  ],
+                  "Projection": {
+                    "ProjectionType": "ALL"
+                  }
+                }
+              ]
+            }
+          },
+          "PardosEventBus": {
+            "Type": "AWS::Events::EventBus",
+            "Properties": {
+              "Name": "pardos-bus"
+            }
+          },
+          "EvidenceBucket": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+              "BucketName": "pardos-evidence",
+              "PublicAccessBlockConfiguration": {
+                "BlockPublicAcls": true,
+                "BlockPublicPolicy": true,
+                "IgnorePublicAcls": true,
+                "RestrictPublicBuckets": true
+              }
+            }
+          }
+        },
+        "Outputs": {
+          "ServerlessDeploymentBucketName": {
+            "Value": {
+              "Ref": "ServerlessDeploymentBucket"
+            },
+            "Export": {
+              "Name": "sls-pardos-chicken-orders-dev-ServerlessDeploymentBucketName"
+            }
+          },
+          "CreateOrderLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "CreateOrderLambdaVersion8OjS6LGXKY3PH3Qulg95AlyzkjwHTmrpamJUG7Rs"
+            },
+            "Export": {
+              "Name": "sls-pardos-chicken-orders-dev-CreateOrderLambdaFunctionQualifiedArn"
+            }
+          },
+          "GetOrderLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "GetOrderLambdaVersionZJXdF9kYEs0LI9gUR9sFgStCOJAnz2W5M1K14Dg1I"
+            },
+            "Export": {
+              "Name": "sls-pardos-chicken-orders-dev-GetOrderLambdaFunctionQualifiedArn"
+            }
+          },
+          "ListAllOrdersLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "ListAllOrdersLambdaVersionPlHrMU1ZxgmamBwLa0inRZ0CZWn41iNoR0lqIN800"
+            },
+            "Export": {
+              "Name": "sls-pardos-chicken-orders-dev-ListAllOrdersLambdaFunctionQualifiedArn"
+            }
+          },
+          "KitchenStartLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "KitchenStartLambdaVersionIW7ro7XeO4v73fnNTmzUpMAWkzSQoXXD2NaVSKKwalU"
+            },
+            "Export": {
+              "Name": "sls-pardos-chicken-orders-dev-KitchenStartLambdaFunctionQualifiedArn"
+            }
+          },
+          "KitchenCompleteLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "KitchenCompleteLambdaVersionFXMa8AvHV7sHdjuEk1W2W43UDusUBJ7COBseFcNrd7U"
+            },
+            "Export": {
+              "Name": "sls-pardos-chicken-orders-dev-KitchenCompleteLambdaFunctionQualifiedArn"
+            }
+          },
+          "PackingCompleteLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "PackingCompleteLambdaVersioneU55BJhInrk34FH6pvvy76jRGrxbs85Ixi6Ii0ljA6A"
+            },
+            "Export": {
+              "Name": "sls-pardos-chicken-orders-dev-PackingCompleteLambdaFunctionQualifiedArn"
+            }
+          },
+          "AssignDriverLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "AssignDriverLambdaVersionDgKynDUBYKNtFtEQLg6zI1FBpMpxWAgXQabzUfTIw"
+            },
+            "Export": {
+              "Name": "sls-pardos-chicken-orders-dev-AssignDriverLambdaFunctionQualifiedArn"
+            }
+          },
+          "OrderDeliveredLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "OrderDeliveredLambdaVersionQOPgo6VpGXmWqRJYWEvYcPrwMwgQ0xDXuS0zCtTng"
+            },
+            "Export": {
+              "Name": "sls-pardos-chicken-orders-dev-OrderDeliveredLambdaFunctionQualifiedArn"
+            }
+          },
+          "ListByStatusLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "ListByStatusLambdaVersion4lBO9NjCyuLZAnsnBRsbgvfIakPgqOqN0RxusbkiVbg"
+            },
+            "Export": {
+              "Name": "sls-pardos-chicken-orders-dev-ListByStatusLambdaFunctionQualifiedArn"
+            }
+          },
+          "HttpApiId": {
+            "Description": "Id of the HTTP API",
+            "Value": {
+              "Ref": "HttpApi"
+            },
+            "Export": {
+              "Name": "sls-pardos-chicken-orders-dev-HttpApiId"
+            }
+          },
+          "HttpApiUrl": {
+            "Description": "URL of the HTTP API",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  "https://",
+                  {
+                    "Ref": "HttpApi"
+                  },
+                  ".execute-api.",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  ".",
+                  {
+                    "Ref": "AWS::URLSuffix"
+                  }
+                ]
+              ]
+            },
+            "Export": {
+              "Name": "sls-pardos-chicken-orders-dev-HttpApiUrl"
+            }
+          }
+        }
+      },
+      "coreCloudFormationTemplate": {
+        "AWSTemplateFormatVersion": "2010-09-09",
+        "Description": "The AWS CloudFormation template for this Serverless application",
+        "Resources": {
+          "ServerlessDeploymentBucket": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+              "BucketEncryption": {
+                "ServerSideEncryptionConfiguration": [
+                  {
+                    "ServerSideEncryptionByDefault": {
+                      "SSEAlgorithm": "AES256"
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "ServerlessDeploymentBucketPolicy": {
+            "Type": "AWS::S3::BucketPolicy",
+            "Properties": {
+              "Bucket": {
+                "Ref": "ServerlessDeploymentBucket"
+              },
+              "PolicyDocument": {
+                "Statement": [
+                  {
+                    "Action": "s3:*",
+                    "Effect": "Deny",
+                    "Principal": "*",
+                    "Resource": [
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "arn:",
+                            {
+                              "Ref": "AWS::Partition"
+                            },
+                            ":s3:::",
+                            {
+                              "Ref": "ServerlessDeploymentBucket"
+                            },
+                            "/*"
+                          ]
+                        ]
+                      },
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "arn:",
+                            {
+                              "Ref": "AWS::Partition"
+                            },
+                            ":s3:::",
+                            {
+                              "Ref": "ServerlessDeploymentBucket"
+                            }
+                          ]
+                        ]
+                      }
+                    ],
+                    "Condition": {
+                      "Bool": {
+                        "aws:SecureTransport": false
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "Outputs": {
+          "ServerlessDeploymentBucketName": {
+            "Value": {
+              "Ref": "ServerlessDeploymentBucket"
+            }
+          }
+        }
+      },
+      "vpc": {}
+    },
+    "pluginsData": {},
+    "functions": {
+      "createOrder": {
+        "handler": "src/orders/create.handler",
+        "events": [
+          {
+            "httpApi": {
+              "path": "/orders",
+              "method": "POST"
+            },
+            "resolvedMethod": "POST",
+            "resolvedPath": "/orders"
+          }
+        ],
+        "name": "pardos-chicken-orders-dev-createOrder",
+        "package": {},
+        "memory": 1024,
+        "timeout": 6,
+        "runtime": "nodejs18.x",
+        "vpc": {},
+        "versionLogicalId": "CreateOrderLambdaVersion8OjS6LGXKY3PH3Qulg95AlyzkjwHTmrpamJUG7Rs"
+      },
+      "getOrder": {
+        "handler": "src/orders/get.handler",
+        "events": [
+          {
+            "httpApi": {
+              "path": "/orders/{orderId}",
+              "method": "GET"
+            },
+            "resolvedMethod": "GET",
+            "resolvedPath": "/orders/{orderId}"
+          }
+        ],
+        "name": "pardos-chicken-orders-dev-getOrder",
+        "package": {},
+        "memory": 1024,
+        "timeout": 6,
+        "runtime": "nodejs18.x",
+        "vpc": {},
+        "versionLogicalId": "GetOrderLambdaVersionZJXdF9kYEs0LI9gUR9sFgStCOJAnz2W5M1K14Dg1I"
+      },
+      "listAllOrders": {
+        "handler": "src/orders/listAll.handler",
+        "events": [
+          {
+            "httpApi": {
+              "path": "/orders",
+              "method": "GET"
+            },
+            "resolvedMethod": "GET",
+            "resolvedPath": "/orders"
+          }
+        ],
+        "name": "pardos-chicken-orders-dev-listAllOrders",
+        "package": {},
+        "memory": 1024,
+        "timeout": 6,
+        "runtime": "nodejs18.x",
+        "vpc": {},
+        "versionLogicalId": "ListAllOrdersLambdaVersionPlHrMU1ZxgmamBwLa0inRZ0CZWn41iNoR0lqIN800"
+      },
+      "kitchenStart": {
+        "handler": "src/kitchen/start.handler",
+        "events": [
+          {
+            "httpApi": {
+              "path": "/kitchen/{orderId}/start",
+              "method": "POST"
+            },
+            "resolvedMethod": "POST",
+            "resolvedPath": "/kitchen/{orderId}/start"
+          }
+        ],
+        "name": "pardos-chicken-orders-dev-kitchenStart",
+        "package": {},
+        "memory": 1024,
+        "timeout": 6,
+        "runtime": "nodejs18.x",
+        "vpc": {},
+        "versionLogicalId": "KitchenStartLambdaVersionIW7ro7XeO4v73fnNTmzUpMAWkzSQoXXD2NaVSKKwalU"
+      },
+      "kitchenComplete": {
+        "handler": "src/kitchen/complete.handler",
+        "events": [
+          {
+            "httpApi": {
+              "path": "/kitchen/{orderId}/complete",
+              "method": "POST"
+            },
+            "resolvedMethod": "POST",
+            "resolvedPath": "/kitchen/{orderId}/complete"
+          }
+        ],
+        "name": "pardos-chicken-orders-dev-kitchenComplete",
+        "package": {},
+        "memory": 1024,
+        "timeout": 6,
+        "runtime": "nodejs18.x",
+        "vpc": {},
+        "versionLogicalId": "KitchenCompleteLambdaVersionFXMa8AvHV7sHdjuEk1W2W43UDusUBJ7COBseFcNrd7U"
+      },
+      "packingComplete": {
+        "handler": "src/packing/complete.handler",
+        "events": [
+          {
+            "httpApi": {
+              "path": "/packing/{orderId}/complete",
+              "method": "POST"
+            },
+            "resolvedMethod": "POST",
+            "resolvedPath": "/packing/{orderId}/complete"
+          }
+        ],
+        "name": "pardos-chicken-orders-dev-packingComplete",
+        "package": {},
+        "memory": 1024,
+        "timeout": 6,
+        "runtime": "nodejs18.x",
+        "vpc": {},
+        "versionLogicalId": "PackingCompleteLambdaVersioneU55BJhInrk34FH6pvvy76jRGrxbs85Ixi6Ii0ljA6A"
+      },
+      "assignDriver": {
+        "handler": "src/delivery/assign.handler",
+        "events": [
+          {
+            "httpApi": {
+              "path": "/delivery/{orderId}/assign",
+              "method": "POST"
+            },
+            "resolvedMethod": "POST",
+            "resolvedPath": "/delivery/{orderId}/assign"
+          }
+        ],
+        "name": "pardos-chicken-orders-dev-assignDriver",
+        "package": {},
+        "memory": 1024,
+        "timeout": 6,
+        "runtime": "nodejs18.x",
+        "vpc": {},
+        "versionLogicalId": "AssignDriverLambdaVersionDgKynDUBYKNtFtEQLg6zI1FBpMpxWAgXQabzUfTIw"
+      },
+      "orderDelivered": {
+        "handler": "src/delivery/delivered.handler",
+        "events": [
+          {
+            "httpApi": {
+              "path": "/delivery/{orderId}/delivered",
+              "method": "POST"
+            },
+            "resolvedMethod": "POST",
+            "resolvedPath": "/delivery/{orderId}/delivered"
+          }
+        ],
+        "name": "pardos-chicken-orders-dev-orderDelivered",
+        "package": {},
+        "memory": 1024,
+        "timeout": 6,
+        "runtime": "nodejs18.x",
+        "vpc": {},
+        "versionLogicalId": "OrderDeliveredLambdaVersionQOPgo6VpGXmWqRJYWEvYcPrwMwgQ0xDXuS0zCtTng"
+      },
+      "listByStatus": {
+        "handler": "src/dashboard/listByStatus.handler",
+        "events": [
+          {
+            "httpApi": {
+              "path": "/dashboard",
+              "method": "GET"
+            },
+            "resolvedMethod": "GET",
+            "resolvedPath": "/dashboard"
+          }
+        ],
+        "name": "pardos-chicken-orders-dev-listByStatus",
+        "package": {},
+        "memory": 1024,
+        "timeout": 6,
+        "runtime": "nodejs18.x",
+        "vpc": {},
+        "versionLogicalId": "ListByStatusLambdaVersion4lBO9NjCyuLZAnsnBRsbgvfIakPgqOqN0RxusbkiVbg"
+      }
+    },
+    "resources": {
+      "Resources": {
+        "OrdersTable": {
+          "Type": "AWS::DynamoDB::Table",
+          "Properties": {
+            "TableName": "pardos-orders",
+            "BillingMode": "PAY_PER_REQUEST",
+            "AttributeDefinitions": [
+              {
+                "AttributeName": "PK",
+                "AttributeType": "S"
+              },
+              {
+                "AttributeName": "SK",
+                "AttributeType": "S"
+              },
+              {
+                "AttributeName": "GSI1PK",
+                "AttributeType": "S"
+              },
+              {
+                "AttributeName": "GSI1SK",
+                "AttributeType": "S"
+              }
+            ],
+            "KeySchema": [
+              {
+                "AttributeName": "PK",
+                "KeyType": "HASH"
+              },
+              {
+                "AttributeName": "SK",
+                "KeyType": "RANGE"
+              }
+            ],
+            "GlobalSecondaryIndexes": [
+              {
+                "IndexName": "GSI1",
+                "KeySchema": [
+                  {
+                    "AttributeName": "GSI1PK",
+                    "KeyType": "HASH"
+                  },
+                  {
+                    "AttributeName": "GSI1SK",
+                    "KeyType": "RANGE"
+                  }
+                ],
+                "Projection": {
+                  "ProjectionType": "ALL"
+                }
+              }
+            ]
+          }
+        },
+        "PardosEventBus": {
+          "Type": "AWS::Events::EventBus",
+          "Properties": {
+            "Name": "pardos-bus"
+          }
+        },
+        "EvidenceBucket": {
+          "Type": "AWS::S3::Bucket",
+          "Properties": {
+            "BucketName": "pardos-evidence",
+            "PublicAccessBlockConfiguration": {
+              "BlockPublicAcls": true,
+              "BlockPublicPolicy": true,
+              "IgnorePublicAcls": true,
+              "RestrictPublicBuckets": true
+            }
+          }
+        }
+      },
+      "Outputs": {}
+    },
+    "configValidationMode": "warn",
+    "serviceFilename": "serverless.yml",
+    "initialServerlessConfig": {
+      "service": "pardos-chicken-orders",
+      "frameworkVersion": "3",
+      "provider": {
+        "$ref": "$[\"service\"][\"provider\"]"
+      },
+      "resources": {
+        "$ref": "$[\"service\"][\"resources\"]"
+      },
+      "functions": {
+        "$ref": "$[\"service\"][\"functions\"]"
+      }
+    },
+    "layers": {},
+    "isDashboardMonitoringPreconfigured": false,
+    "artifact": "/home/ubuntu/pardos-chicken/backend/.serverless/pardos-chicken-orders.zip"
+  },
+  "package": {
+    "artifactDirectoryName": "serverless/pardos-chicken-orders/dev/1763586280695-2025-11-19T21:04:40.695Z",
+    "artifact": "pardos-chicken-orders.zip"
+  }
+}
